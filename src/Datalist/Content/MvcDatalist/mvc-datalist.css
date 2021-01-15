@@ -1,0 +1,474 @@
+﻿/*!
+ * Datalist 7.2.1
+ * https://github.com/NonFactors/MVC5.Datalist
+ *
+ * Copyright © NonFactors
+ *
+ * Licensed under the terms of the MIT License
+ * http://www.opensource.org/licenses/mit-license.php
+ */
+
+.datalist {
+    font-size: 1rem;
+    display: flex;
+    width: 100%;
+}
+
+.datalist-control {
+    padding: 0.125em 2em 0.125em 0.125em;
+    border-radius: 0.25em 0 0 0.25em;
+    border: 1px solid #ced4da;
+    background: #ffffff;
+    position: relative;
+    flex: 1;
+}
+
+.datalist-item {
+    transition: background-color linear 0.3s;
+    padding: 1px 1px 1px 0.375em;
+    border: 1px solid #dee2e6;
+    border-radius: 0.1875em;
+    display: inline-block;
+    white-space: nowrap;
+    background: #f8f8f8;
+    line-height: 1.5;
+    margin: 0.125em;
+    color: #999999;
+}
+
+.datalist-item:hover {
+    border-color: #cccccc;
+    background: #f0f0f0;
+}
+
+.datalist-deselect {
+    transition: color 0.5s;
+    padding: 0 0.25em;
+    background: none;
+    cursor: pointer;
+    color: #999999;
+    border: none;
+}
+
+.datalist-deselect:hover {
+    color: #000000;
+}
+
+.datalist-input {
+    padding: 0.25em 0.25em 0.25em 0.5em;
+    box-sizing: border-box;
+    line-height: 1.5;
+    background: none;
+    font-size: 1em;
+    color: #495057;
+    outline: none;
+    border: none;
+    height: 2em;
+    width: 99%;
+}
+
+.datalist-input::-ms-clear {
+    display: none;
+}
+
+.datalist-control-loader {
+    animation: datalist-spin 1s infinite linear;
+    border: 0.125em solid rgba(0, 0, 0, 0.2);
+    border-top-color: #444444;
+    box-sizing: border-box;
+    border-radius: 50%;
+    position: absolute;
+    display: none;
+    right: 0.65em;
+    height: 1em;
+    top: 0.65em;
+    width: 1em;
+}
+
+.datalist-control-error {
+    border: 0.0625em solid rgba(255, 0, 0, 0.5);
+    background: rgba(255, 255, 255, 0.5);
+    transition: opacity 0.3s linear;
+    color: rgba(255, 0, 0, 0.5);
+    box-sizing: border-box;
+    border-radius: 50%;
+    text-align: center;
+    position: absolute;
+    font-size: 0.9em;
+    cursor: default;
+    height: 1.5rem;
+    right: 0.45em;
+    width: 1.5rem;
+    top: 0.4rem;
+    opacity: 0;
+}
+
+.datalist-loading .datalist-control-loader {
+    display: block;
+}
+
+.datalist-error .datalist-control-error {
+    opacity: 1;
+}
+
+.datalist-browser {
+    border-radius: 0 0.25em 0.25em 0;
+    border: 1px solid #ced4da;
+    padding: 0.375em 0.75em;
+    background: #e9ecef;
+    margin-left: -1px;
+    cursor: pointer;
+    color: #495057;
+}
+
+.datalist-browser:focus {
+    z-index: 2;
+}
+
+.datalist-browser:active {
+    outline: none;
+}
+
+.datalist-icon {
+    margin: 0 0.125em 0.125em 0;
+    transform: rotate(310deg);
+    box-sizing: border-box;
+    border: 0.125em solid;
+    border-radius: 50%;
+    display: block;
+    height: 0.8em;
+    width: 0.8em;
+}
+
+.datalist-icon:before {
+    box-shadow: inset 0 0 0 2em;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    position: absolute;
+    width: 0.1875em;
+    height: 0.5em;
+    content: '';
+    top: 0.6em;
+    left: 45%;
+}
+
+.datalist-readonly .datalist-control {
+    background: #e9ecef;
+}
+
+.datalist-readonly .datalist-item {
+    padding: 1px 0.375em;
+}
+
+.datalist-readonly .datalist-deselect {
+    display: none;
+}
+
+.datalist-readonly .datalist-browser {
+    cursor: not-allowed;
+}
+
+.datalist-browseless .datalist-control {
+    border-radius: 0.25em;
+}
+
+.datalist-open {
+    overflow: hidden;
+}
+
+.datalist-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    box-sizing: border-box;
+    overflow-x: auto;
+    padding: 3em 1em;
+    font-size: 1rem;
+    position: fixed;
+    display: none;
+    z-index: 1000;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+}
+
+.datalist-wrapper {
+    justify-content: center;
+    display: flex;
+}
+
+.datalist-dialog {
+    min-width: 400px;
+    max-width: 100%;
+    z-index: 1100;
+}
+
+@media (max-width: 575px) {
+    .datalist-dialog {
+        min-width: 325px;
+    }
+}
+
+.datalist-header {
+    border: 1px solid rgba(30, 54, 101, 0.8);
+    border-radius: 0.25em 0.25em 0 0;
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.4em 0.6em 0.4em 1em;
+    background: #4d6189;
+    border-bottom: none;
+    font-weight: bold;
+    display: flex;
+}
+
+.datalist-title {
+    font-size: 1.1em;
+    flex: 1;
+}
+
+.datalist-close {
+    color: rgba(255, 255, 255, 0.8);
+    transition: color 0.3s;
+    font-weight: bold;
+    background: none;
+    font-size: 1.2em;
+    cursor: pointer;
+    line-height: 1;
+    border: none;
+}
+
+.datalist-close:hover {
+    color: rgba(255, 255, 255, 1);
+}
+
+.datalist-body {
+    border: 1px solid rgba(30, 54, 101, 0.8);
+    border-radius: 0 0 0.25em 0.25em;
+    background: #ffffff;
+    font-size: 0.875em;
+    padding: 1em;
+}
+
+.datalist-search-area {
+    display: flex;
+}
+
+.datalist-search {
+    border-radius: 0.25em 0 0 0.25em;
+    border: 1px solid #ced4da;
+    padding: 0.4em 0.85em;
+    line-height: 1.5;
+    color: #495057;
+    width: 100%;
+    flex: 1;
+}
+
+.datalist-search::-ms-clear {
+    display: none;
+}
+
+.datalist-rows {
+    border-radius: 0 0.25em 0.25em 0;
+    border: 1px solid #ced4da;
+    background: #e9ecef;
+    text-align: center;
+    border-left: none;
+    line-height: 1.5;
+    width: 3.8em;
+}
+
+.datalist-rows::-ms-clear {
+    display: none;
+}
+
+.datalist-selector {
+    background: rgba(78, 169, 86, 0.8);
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px solid #5c9845;
+    transition: color 0.3s;
+    border-radius: 0.25em;
+    margin-left: 0.5em;
+    padding: 0 0.5em;
+    cursor: pointer;
+    min-width: 7em;
+}
+
+.datalist-selector:hover {
+    color: #ffffff;
+}
+
+.datalist-content {
+    margin-top: 0.75em;
+    position: relative;
+    min-height: 6.9em;
+}
+
+.datalist-dialog-error,
+.datalist-dialog-loader {
+    border: 1px solid #dddddd;
+    transition: opacity 0.3s;
+    justify-content: center;
+    background: #ffffff;
+    align-items: center;
+    position: absolute;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+}
+
+.datalist-dialog-loader > span {
+    animation: datalist-spin 1s infinite linear;
+    border: 0.5em solid rgba(0, 0, 0, 0.2);
+    border-top-color: #444444;
+}
+
+.datalist-dialog-loader > span,
+.datalist-dialog-loader > span:after {
+    border-radius: 50%;
+    height: 5em;
+    width: 5em;
+}
+
+.datalist-dialog-error {
+    border-color: #ebccd1;
+    background: #fff6f6;
+    color: #a94442;
+}
+
+.datalist-table {
+    overflow-x: auto;
+}
+
+.datalist-table table {
+    border-collapse: collapse;
+    border: none;
+    width: 100%;
+}
+
+.datalist-table tr {
+    cursor: pointer;
+}
+
+.datalist-table tbody tr:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.datalist-table .selected {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.datalist-table th {
+    text-align: center;
+}
+
+.datalist-table th,
+.datalist-table td {
+    border: 1px solid #dee2e6;
+    padding: 0.3em 0.6em;
+    line-height: 1.5;
+}
+
+.datalist-table .datalist-asc::after {
+    padding-left: 0.25em;
+    content: '\2193';
+}
+
+.datalist-table .datalist-desc::after {
+    padding-left: 0.25em;
+    content: '\2191';
+}
+
+.datalist-table .datalist-split td {
+    background: #ffffff;
+    color: transparent;
+    font-size: 0.5em;
+    cursor: default;
+    border: none;
+}
+
+.datalist-table td:last-child {
+    box-sizing: border-box;
+    text-align: center;
+    font-weight: bold;
+    width: 2em;
+}
+
+.datalist-table td:last-child::after {
+    content: '\25CF';
+}
+
+.datalist-table .selected td:last-child::after {
+    content: '\2714';
+    color: #5cb85c;
+}
+
+.datalist-table .datalist-empty {
+    text-align: center;
+    cursor: default;
+}
+
+.datalist-table .datalist-empty:hover {
+    background: inherit;
+}
+
+.datalist-table .datalist-empty td {
+    font-weight: normal;
+}
+
+.datalist-table .datalist-empty td::after {
+    content: '';
+}
+
+.datalist-footer {
+    text-align: center;
+}
+
+.datalist-load-more {
+    transition: background-color 0.3s;
+    border: 1px solid #dee2e6;
+    margin-bottom: 0.25em;
+    padding: 0.25em 0.5em;
+    margin-top: 1.2em;
+    background: none;
+    cursor: pointer;
+    color: #777777;
+}
+
+.datalist-load-more:focus,
+.datalist-load-more:hover {
+    background: #eeeeee;
+}
+
+.datalist-autocomplete {
+    border: 1px solid #d3d3d3;
+    background: #ffffff;
+    margin-bottom: 1em;
+    position: absolute;
+    list-style: none;
+    cursor: pointer;
+    z-index: 1200;
+    padding: 0;
+}
+
+.datalist-autocomplete li {
+    padding: 0.25em 0.5em;
+}
+
+.datalist-autocomplete li.active {
+    border: 1px solid #aaaaaa;
+    margin: -1px;
+}
+
+.datalist-autocomplete-no-data {
+    font-weight: bold;
+    cursor: default;
+}
+
+@keyframes datalist-spin {
+    0% {
+        transform: rotate(0);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

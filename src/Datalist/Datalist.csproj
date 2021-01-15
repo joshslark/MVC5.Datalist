@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+      <Version>7.2.1</Version>
+      <Nullable>enable</Nullable>
+      <LangVersion>8.0</LangVersion>
+      <PackageId>Datalist</PackageId>
+      <TargetFramework>net45</TargetFramework>
+      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    </PropertyGroup>
+
+</Project>
