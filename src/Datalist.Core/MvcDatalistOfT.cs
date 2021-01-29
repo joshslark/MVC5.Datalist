@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Dynamic;
 using System.Reflection;
+using FuzzyString;
 
 namespace Datalist
 {
@@ -91,16 +92,41 @@ namespace Datalist
                 return models;
 
             List<String> queries = new List<String>();
+            List<string> properties = new List<string>();
             foreach (String property in Columns.Where(column => !column.Hidden && column.Filterable).Select(column => column.Key))
                 if (typeof(T).GetProperty(property)?.PropertyType == typeof(String))
+                {
+
                     queries.Add($"({property} != null && {property}.ToLower().Contains(@0))");
+                    properties.Add(property);
+                }
 
             if (queries.Count == 0)
                 return models;
 
-            return models.Where(String.Join(" || ", queries), Filter.Search!.ToLower());
+            IQueryable<T> filteredModels = models.Where(model => ScoreSearchMatch(Filter.Search!, model, properties) > 0.0);
+            filteredModels = filteredModels.OrderBy(model => ScoreSearchMatch(Filter.Search!, model, properties));
+            var scores = filteredModels.Select(model => new { model, score = ScoreSearchMatch(Filter.Search!, model, properties) });
+
+            return filteredModels;
         }
-        public virtual IQueryable<T> FilterByAdditionalFilters(IQueryable<T> models)
+        private double ScoreSearchMatch(string searchInput, object model, List<string> modelProperties)
+        {
+            List<double> scores = new List<double>();
+            foreach (string property in modelProperties)
+            {
+                object propertyValue = typeof(T).GetProperty(property).GetValue(model);
+                if (propertyValue == null || propertyValue.GetType() != typeof(string))
+                {
+                    scores.Add(0.0);
+                }
+                double score = searchInput.JaroWinklerDistance(propertyValue?.ToString().ToLower());
+                scores.Add(score);
+			}
+
+            return scores.Max();
+		}
+		public virtual IQueryable<T> FilterByAdditionalFilters(IQueryable<T> models)
         {
             foreach (KeyValuePair<String, Object?> filter in Filter.AdditionalFilters.Where(item => item.Value != null))
                 if (filter.Value is IEnumerable && !(filter.Value is String))
