@@ -134,12 +134,13 @@ namespace Datalist
                 else if (propertyValue.StartsWith(searchInput))
                 {
                     int score = searchInput?.Length ?? 0;
-                    scores.Add(score);
+                    double lowerScore = score - 0.2;
+                    scores.Add(lowerScore);
                 }
                 else if (lowercasePropertyValue?.StartsWith(lowercaseSearchInput) ?? false)
                 {
                     int score = searchInput?.Length ?? 0;
-                    double lowerScore = score - 0.1;
+                    double lowerScore = score - 0.3;
                     scores.Add(lowerScore);
                 }
                 else
