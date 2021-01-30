@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Drawing.Design;
 using System.Linq;
 using System.Linq.Dynamic;
 using System.Reflection;
@@ -104,24 +105,48 @@ namespace Datalist
             if (queries.Count == 0)
                 return models;
 
-            IQueryable<T> filteredModels = models.Where(model => ScoreSearchMatch(Filter.Search!, model, properties) > 0.0);
-            filteredModels = filteredModels.OrderBy(model => ScoreSearchMatch(Filter.Search!, model, properties));
-            var scores = filteredModels.Select(model => new { model, score = ScoreSearchMatch(Filter.Search!, model, properties) });
+            IQueryable<T> filteredModels = models.Where(model => ScoreSearchMatch(Filter.Search, model, properties) > 0.5);
+            filteredModels = filteredModels.OrderByDescending(model => ScoreSearchMatch(Filter.Search, model, properties));
+            var scores = filteredModels.Select(model => new { model, score = ScoreSearchMatch(Filter.Search, model, properties) });
 
             return filteredModels;
         }
-        private double ScoreSearchMatch(string searchInput, object model, List<string> modelProperties)
+        private double ScoreSearchMatch(String? searchInput, T model, List<string> modelProperties)
         {
             List<double> scores = new List<double>();
+            String? lowercaseSearchInput = searchInput?.ToLower();
             foreach (string property in modelProperties)
             {
-                object propertyValue = typeof(T).GetProperty(property).GetValue(model);
-                if (propertyValue == null || propertyValue.GetType() != typeof(string))
+                String? propertyValue = GetValue(model, property);
+                String? lowercasePropertyValue = propertyValue?.ToLower();
+                if (propertyValue == null)
                 {
                     scores.Add(0.0);
                 }
-                double score = searchInput.JaroWinklerDistance(propertyValue?.ToString().ToLower());
-                scores.Add(score);
+                else if (propertyValue.Equals(searchInput))
+                {
+                    scores.Add(propertyValue.Length);
+                }
+                else if (lowercasePropertyValue?.Equals(lowercaseSearchInput) ?? false)
+                {
+                    scores.Add(propertyValue.Length - 0.1);
+                }
+                else if (propertyValue.StartsWith(searchInput))
+                {
+                    int score = searchInput?.Length ?? 0;
+                    scores.Add(score);
+                }
+                else if (lowercasePropertyValue?.StartsWith(lowercaseSearchInput) ?? false)
+                {
+                    int score = searchInput?.Length ?? 0;
+                    double lowerScore = score - 0.1;
+                    scores.Add(lowerScore);
+                }
+                else
+                {
+                    double score = searchInput.JaroWinklerDistance(propertyValue);
+                    scores.Add(score);
+                }
 			}
 
             return scores.Max();
