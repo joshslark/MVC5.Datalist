@@ -144,7 +144,7 @@ namespace Datalist
                 }
                 else
                 {
-                    double score = searchInput.JaroWinklerDistance(propertyValue);
+                    double score = searchInput.RatcliffObershelpSimilarity(propertyValue);
                     scores.Add(score);
                 }
 			}
