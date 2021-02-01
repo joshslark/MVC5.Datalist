@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Datalist.Core;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,7 +8,6 @@ using System.Drawing.Design;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Reflection;
-using FuzzyString;
 
 namespace Datalist
 {
@@ -151,8 +151,8 @@ namespace Datalist
                 }
                 else
                 {
-                    double score = searchInput.RatcliffObershelpSimilarity(propertyValue);
-                    int characterMatches = searchInput.Intersect(propertyValue).Count();
+                    double score = searchInput?.RatcliffObershelpSimilarity(propertyValue) ?? 0.0;
+                    int characterMatches = searchInput.Where(ch => propertyValue.Contains(ch)).Count();
                     if (characterMatches == searchInput?.Length)
                     {
                         score++;

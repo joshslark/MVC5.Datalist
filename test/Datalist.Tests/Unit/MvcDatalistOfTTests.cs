@@ -18,6 +18,7 @@ namespace Datalist.Tests.Unit
             datalist.Filter.Rows = 20;
 
             for (Int32 i = 0; i < 200; i++)
+            {
                 datalist.Models.Add(new TestModel
                 {
                     Id = i + "I",
@@ -26,6 +27,15 @@ namespace Datalist.Tests.Unit
                     ParentId = "1000",
                     Date = new DateTime(2014, 12, 10).AddDays(i)
                 });
+            }
+            datalist.Models.Add(new TestModel
+            {
+                Id = "ProductGroup",
+                Count = 0,
+                Value = "UNITYSALES__Product_Group__c",
+                ParentId = "1000",
+                Date = DateTime.Today
+            });
         }
 
         [Fact]
@@ -284,6 +294,23 @@ namespace Datalist.Tests.Unit
 
             Assert.Equal(datalist.Columns, actual.Columns);
             Assert.Equal(15, actual.Rows.Count);
+            Assert.Empty(actual.Selected);
+        }
+
+        [Fact]
+        public void GetData_SearchFindsProductGroup()
+        {
+            datalist.Filter.Search = "ProductGroup";
+            datalist.Filter.Sort = "Count";
+
+            datalist.GetData();
+
+            DatalistData actual = datalist.GetData();
+
+            Assert.Equal("Product_Group__c", actual.Rows[0]["Label"]);
+
+            Assert.Equal(datalist.Columns, actual.Columns);
+            Assert.InRange(actual.Rows.Count, 1, 15);
             Assert.Empty(actual.Selected);
         }
 

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-      <Version>7.4.0</Version>
+      <Version>7.4.1</Version>
       <Nullable>enable</Nullable>
       <Company>NonFactors</Company>
       <LangVersion>8.0</LangVersion>
@@ -14,7 +14,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="FuzzyString" Version="1.0.0" />
       <PackageReference Include="Microsoft.AspNet.Mvc" Version="4.0.40804" />
       <PackageReference Include="System.Linq.Dynamic" Version="1.0.8" />
       <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.7" />
