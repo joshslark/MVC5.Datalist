@@ -173,6 +173,7 @@ namespace Datalist
 
             control.InnerHtml += loader.ToString();
             control.InnerHtml += error.ToString();
+            control.InnerHtml += CreateDatalistClear(name);
 
             return control.ToString();
         }
@@ -189,6 +190,22 @@ namespace Datalist
             browser.InnerHtml = icon.ToString();
 
             return browser.ToString();
+        }
+
+        private static String CreateDatalistClear(String name)
+        {
+            TagBuilder clear = new TagBuilder("button");
+            clear.AddCssClass("datalist-clear");
+            clear.Attributes["data-for"] = name;
+            clear.Attributes["type"] = "button";
+
+            TagBuilder icon = new TagBuilder("span");
+            icon.AddCssClass("fa");
+            icon.AddCssClass("fa-times");
+
+            clear.InnerHtml = icon.ToString();
+
+            return clear.ToString();
         }
     }
 }
