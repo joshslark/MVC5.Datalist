@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing.Design;
 using System.Linq;
-using System.Linq.Dynamic;
+using System.Linq.Dynamic.Core;
 using System.Reflection;
 using FuzzyString;
 
@@ -62,7 +62,7 @@ namespace Datalist
         {
             IQueryable<T> models = GetModels();
             IQueryable<T> selected = new T[0].AsQueryable();
-            IQueryable<T> notSelected = Sort(FilterByRequest(models));
+            IQueryable<T> notSelected = FilterByRequest(models);
 
             if (Filter.Offset == 0 && Filter.Ids.Count == 0 && Filter.Selected.Count > 0)
                 selected = Sort(FilterBySelected(models, Filter.Selected));
@@ -105,11 +105,17 @@ namespace Datalist
             if (queries.Count == 0)
                 return models;
 
-            IQueryable<T> filteredModels = models.Where(model => ScoreSearchMatch(Filter.Search, model, properties) > 0.5);
-            filteredModels = filteredModels.OrderByDescending(model => ScoreSearchMatch(Filter.Search, model, properties));
-            var scores = filteredModels.Select(model => new { model, score = ScoreSearchMatch(Filter.Search, model, properties) });
+            IQueryable<T> filteredModels = models.Where(model => ScoreSearchMatch(Filter.Search, model, properties) > 0.6);
+            IOrderedQueryable<T> sortedFilteredModels = filteredModels.OrderByDescending(model => ScoreSearchMatch(Filter.Search, model, properties));
 
-            return filteredModels;
+            if (!String.IsNullOrWhiteSpace(Filter.Sort))
+            {
+                filteredModels = sortedFilteredModels.ThenBy(Filter.Sort + " " + Filter.Order);
+            }
+
+            var scores = sortedFilteredModels.Select(model => new { model, score = ScoreSearchMatch(Filter.Search, model, properties) });
+
+            return sortedFilteredModels.Take(15);
         }
         private double ScoreSearchMatch(String? searchInput, T model, List<string> modelProperties)
         {
@@ -146,6 +152,11 @@ namespace Datalist
                 else
                 {
                     double score = searchInput.RatcliffObershelpSimilarity(propertyValue);
+                    int characterMatches = searchInput.Intersect(propertyValue).Count();
+                    if (characterMatches == searchInput?.Length)
+                    {
+                        score++;
+                    }
                     scores.Add(score);
                 }
 			}
@@ -156,7 +167,7 @@ namespace Datalist
         {
             foreach (KeyValuePair<String, Object?> filter in Filter.AdditionalFilters.Where(item => item.Value != null))
                 if (filter.Value is IEnumerable && !(filter.Value is String))
-                    models = models.Where($"@0.Contains(outerIt.{filter.Key})", filter.Value).AsQueryable();
+                    models = models.Where($"@0.Contains(it.{filter.Key})", filter.Value).AsQueryable();
                 else
                     models = models.Where($"({filter.Key} != null && {filter.Key} == @0)", filter.Value);
 
@@ -171,7 +182,7 @@ namespace Datalist
                 throw new DatalistException($"'{typeof(T).Name}' type does not have key or property named 'Id', required for automatic id filtering.");
 
             if (IsFilterable(key.PropertyType))
-                return models.Where($"@0.Contains(outerIt.{key.Name})", Parse(key.PropertyType, ids));
+                return models.Where($"@0.Contains(it.{key.Name})", Parse(key.PropertyType, ids));
 
             throw new DatalistException($"'{typeof(T).Name}.{key.Name}' property type has to be a string, guid or a number.");
         }
@@ -184,7 +195,7 @@ namespace Datalist
                 throw new DatalistException($"'{typeof(T).Name}' type does not have key or property named 'Id', required for automatic id filtering.");
 
             if (IsFilterable(key.PropertyType))
-                return models.Where($"!@0.Contains(outerIt.{key.Name})", Parse(key.PropertyType, ids));
+                return models.Where($"!@0.Contains(it.{key.Name})", Parse(key.PropertyType, ids));
 
             throw new DatalistException($"'{typeof(T).Name}.{key.Name}' property type has to be a string, guid or a number.");
         }

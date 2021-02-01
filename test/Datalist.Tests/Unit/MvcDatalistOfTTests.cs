@@ -243,7 +243,6 @@ namespace Datalist.Tests.Unit
 
             Assert.Equal(datalist.Columns, actual.Columns);
             Assert.Equal(2, actual.Selected.Count);
-            Assert.Single(actual.Rows);
         }
 
         [Fact]
@@ -283,14 +282,8 @@ namespace Datalist.Tests.Unit
             Assert.Equal("43", actual.Rows[0]["Count"]);
             Assert.Equal("33I", actual.Rows[0]["Id"]);
 
-            Assert.Equal(new DateTime(2015, 4, 22).ToString("d"), actual.Rows[1]["Date"]);
-            Assert.Equal("133V", actual.Rows[1]["Label"]);
-            Assert.Equal("133V", actual.Rows[1]["Value"]);
-            Assert.Equal("143", actual.Rows[1]["Count"]);
-            Assert.Equal("133I", actual.Rows[1]["Id"]);
-
             Assert.Equal(datalist.Columns, actual.Columns);
-            Assert.Equal(2, actual.Rows.Count);
+            Assert.Equal(15, actual.Rows.Count);
             Assert.Empty(actual.Selected);
         }
 
@@ -310,12 +303,6 @@ namespace Datalist.Tests.Unit
             Assert.Equal("55V", actual.Rows[0]["Value"]);
             Assert.Equal("65", actual.Rows[0]["Count"]);
             Assert.Equal("55I", actual.Rows[0]["Id"]);
-
-            Assert.Equal(new DateTime(2015, 5, 14).ToString("d"), actual.Rows[1]["Date"]);
-            Assert.Equal("155V", actual.Rows[1]["Label"]);
-            Assert.Equal("155V", actual.Rows[1]["Value"]);
-            Assert.Equal("165", actual.Rows[1]["Count"]);
-            Assert.Equal("155I", actual.Rows[1]["Id"]);
         }
 
         [Theory]
@@ -349,7 +336,7 @@ namespace Datalist.Tests.Unit
         {
             datalist.Filter.Search = "1";
 
-            IQueryable<TestModel> expected = datalist.GetModels().Where(model => model.Id!.Contains("1"));
+            IQueryable<TestModel> expected = datalist.GetModels().Where(model => model.Id!.Contains("1")).Take(5);
             IQueryable<TestModel> actual = datalist.FilterBySearch(datalist.GetModels());
 
             Assert.Equal(expected, actual);
