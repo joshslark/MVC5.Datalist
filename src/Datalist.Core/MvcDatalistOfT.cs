@@ -151,9 +151,9 @@ namespace Datalist
                 }
                 else
                 {
-                    double score = searchInput?.RatcliffObershelpSimilarity(propertyValue) ?? 0.0;
-                    int characterMatches = searchInput.Where(ch => propertyValue.Contains(ch)).Count();
-                    if (characterMatches == searchInput?.Length)
+                    double score = lowercaseSearchInput?.RatcliffObershelpSimilarity(lowercasePropertyValue ?? "") ?? 0.0;
+                    int characterMatches = lowercaseSearchInput.Where(ch => lowercasePropertyValue.Contains(ch)).Count();
+                    if (characterMatches == lowercaseSearchInput?.Length)
                     {
                         score++;
                     }
